@@ -1,4 +1,7 @@
 module github.com/Samuel/serverless-notes
 
+go 1.17
+
 require github.com/aws/aws-lambda-go v1.6.0
-require github.com/google/uuid v1.3.0
+
+require github.com/stretchr/testify v1.7.0 // indirect
