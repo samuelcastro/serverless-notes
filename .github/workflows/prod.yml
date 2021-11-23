@@ -26,6 +26,7 @@ jobs:
           find . | grep -v "\/\.git\/"
           make
           find . | grep -v "\/\.git\/"
+          go mod tidy
 
       - name: Install serverless packages
         run: |
