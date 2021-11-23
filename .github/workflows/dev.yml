@@ -1,0 +1,46 @@
+name: dev
+
+on:
+  push:
+    branches:  
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ '1.17' ]
+    name: Go ${{ matrix.go }} sample
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - run: |
+          env | sort
+          echo "[PWD] ===> $(pwd)"
+          find . | grep -v "\/\.git\/"
+          make
+          find . | grep -v "\/\.git\/"
+
+      - name: Install serverless packages
+        run: |
+          npm install
+          npm install -g serverless
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.CLOUD_EXPERIENCES_DEV_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.CLOUD_EXPERIENCES_DEV_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Serverless Deploy
+        uses: serverless/github-action@master
+        with:
+          args: deploy --stage dev --region us-east-1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CLOUD_EXPERIENCES_DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUD_EXPERIENCES_DEV_AWS_SECRET_ACCESS_KEY }}
