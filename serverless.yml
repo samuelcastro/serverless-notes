@@ -1,0 +1,65 @@
+service: serverless-notes
+# app and org for use with dashboard.serverless.com
+# app: serverless-notes
+# org: samuelsilva
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: go1.x
+  lambdaHashingVersion: 20201221
+  stage: dev
+  memorySize: 128
+  timeout: 5
+  endpointType: EDGE # Default is EDGE, other options are REGIONAL or PRIVATE, see: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-basic-concept.html#apigateway-definition-edge-optimized-api-endpoint
+  environment:
+    NOTES_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+
+resources:
+  Resources:
+     NotesTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:provider.environment.NOTES_TABLE}
+        AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: N
+          - AttributeName: note_id
+            AttributeType: S
+        KeySchema: 
+          - AttributeName: user_id
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes: 
+          - IndexName: node_id-index
+            KeySchema:
+              - AttributeName: note_id
+                KeyType: HASH
+            Projection: 
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
+# functions:
+#   hello:
+#     handler: bin/hello
+#     events:
+#       - httpApi:
+#           path: /hello
+#           method: get
