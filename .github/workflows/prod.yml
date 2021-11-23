@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         go: [ '1.17' ]
-    name: Go ${{ matrix.go }} sample
+    name: Go ${{ matrix.go }} version
     steps:
       - uses: actions/checkout@v2
       - name: Setup go
@@ -26,7 +26,6 @@ jobs:
           find . | grep -v "\/\.git\/"
           make
           find . | grep -v "\/\.git\/"
-          go mod tidy
 
       - name: Install serverless packages
         run: |
