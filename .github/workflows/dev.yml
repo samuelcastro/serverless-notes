@@ -6,10 +6,9 @@ on:
       - dev
 
 jobs:
-  build:
-    environment: dev
   deploy:
     runs-on: ubuntu-latest
+    environment: dev
     strategy:
       matrix:
         go: [ '1.17' ]
