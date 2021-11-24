@@ -6,6 +6,8 @@ on:
       - dev
 
 jobs:
+  build:
+    environment: dev
   deploy:
     runs-on: ubuntu-latest
     strategy:
@@ -29,7 +31,6 @@ jobs:
         run: |
           npm install
           npm install -g serverless
-          echo ${{ secrets.AWS_ACCESS_KEY_ID }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
