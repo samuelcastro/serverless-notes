@@ -1,4 +1,4 @@
-module github.com/Samuel/serverless-notes
+module serverless-notes
 
 go 1.17
 
