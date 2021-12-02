@@ -28,7 +28,6 @@ jobs:
 
       - name: Install serverless packages
         run: |
-          npm install
           npm install -g serverless
 
       - name: Configure AWS Credentials
