@@ -6,3 +6,11 @@ func GetResponseHeaders() map[string]string {
 		"Access-Control-Allow-Origin": "*",
 	}
 }
+
+func GetUserId(headers map[string]string) string {
+	return headers["app_user_id"]
+}
+
+func GetUserName(headers map[string]string) string {
+	return headers["app_user_name"]
+}

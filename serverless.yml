@@ -17,6 +17,30 @@ provider:
   endpointType: EDGE # Default is EDGE, other options are REGIONAL or PRIVATE, see: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-basic-concept.html#apigateway-definition-edge-optimized-api-endpoint
   environment:
     NOTES_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:*:*:*"
+
+custom:
+  allowedHeaders:
+    - Accept
+    - Content-Type
+    - Content-Length
+    - Authorization
+    - X-Amz-Date
+    - X-Api-Key
+    - X-Amz-Security-Token
+    - X-Amz-User-Agent
+    - app_user_id
+    - app_user_name
 
 package:
   patterns:
@@ -27,7 +51,7 @@ resources:
   Resources:
      NotesTable:
       Type: AWS::DynamoDB::Table
-      DeletionPolicy: Retain
+      # DeletionPolicy: Retain
       Properties:
         TableName: ${self:provider.environment.NOTES_TABLE}
         AttributeDefinitions:
@@ -56,10 +80,14 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
 
-# functions:
-#   hello:
-#     handler: bin/hello
-#     events:
-#       - httpApi:
-#           path: /hello
-#           method: get
+functions:
+  add:
+    handler: bin/functions/add
+    description: POST /notes
+    events:
+      - httpApi:
+          path: /notes
+          method: POST
+          cors: 
+            origin: '*'
+            headers: ${self:custom.allowedHeaders}
